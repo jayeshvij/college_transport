@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transport Portal Home</title>
+    
+    <!-- Simple styling using internal CSS, keeping the blue color -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Light gray background */
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #1e3a8a; /* Dark blue from login page */
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        #logout-btn {
+            background-color: #ff9900; /* A simple orange/gold accent */
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+
+        #logout-btn:hover {
+            background-color: #e68a00;
+        }
+
+        #main-content {
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap; /* Allows cards to wrap on mobile */
+            gap: 20px; /* Space between the information boxes */
+            justify-content: center;
+        }
+
+        .info-card {
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            width: 100%; /* Full width on small screens */
+            max-width: 400px; /* Max width on desktop */
+            box-shadow: 2px 2px 5px #aaa;
+        }
+
+        .info-card h2 {
+            color: #1e3a8a;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Welcome to the Transport Portal</h1>
+        <button id="logout-btn" onclick="logout()">Logout</button>
+    </header>
+
+    <div id="main-content">
+
+        <!-- Card 1: User's Route Information - UPDATED -->
+        <div class="info-card">
+            <h2>My Current Route</h2>
+            <p><strong>Name:</strong> <span id="user-id">Jayesh</span></p>
+            <p><strong>Assigned Bus:</strong> Bus 42B</p>
+            <p><strong>Route Name:</strong> Outer Ring Road</p>
+            <p><strong>Morning Pickup Stop:</strong> Koramangala</p>
+            <p><strong>Afternoon Drop-off Stop:</strong> Koramangala</p>
+        </div>
+
+        <!-- Card 2: Schedule/Time Information -->
+        <div class="info-card">
+            <h2>Today's Schedule</h2>
+            <!-- Removed live clock here to simplify -->
+            <p>This schedule is fixed daily.</p>
+            <hr>
+            <p><strong>Morning Pickup Time:</strong> 7:45 AM</p>
+            <p><strong>Arrival Time at College:</strong> 8:20 AM</p>
+            <hr>
+            <p><strong>Afternoon Departure Time:</strong> 4:30 PM</p>
+        </div>
+
+        <!-- Card 3: Contact Information - UPDATED -->
+        <div class="info-card">
+            <h2>Contact Transport Office</h2>
+            <p>If you have questions about schedules or need assistance:</p>
+            <p><strong>Phone:</strong> 98449 99911</p>
+            <p><strong>Email:</strong> transport@sjbit.edu.in</p>
+        </div>
+
+    </div>
+
+    <!-- Simple JavaScript for functionality -->
+    <script>
+        // All the time-related functions (updateTime, setInterval) were removed!
+
+        /**
+         * Function to log the user out and redirect them to the registration page.
+         */
+        function logout() {
+            // A beginner's way to go to the registration page
+            window.location.href = 'register.html'; 
+        }
+
+    </script>
+</body>
+</html>

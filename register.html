@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Login System</title>
+    
+    <!-- Simple styling using internal CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        #login-box {
+            width: 300px;
+            padding: 20px;
+            background-color: white;
+            border: 1px solid #ccc; /* Simple border */
+            box-shadow: 3px 3px 5px #aaa; /* Basic shadow */
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e3a8a; /* Simple dark blue color */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 90%;
+            padding: 8px;
+            border: 1px solid #999;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #3354a5; /* Slightly lighter on hover */
+        }
+        
+        #statusMessage {
+            text-align: center;
+            padding: 10px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-box">
+        <h1>College Portal Login</h1>
+        
+        <!-- Status Message Area - starts hidden -->
+        <p id="statusMessage" style="display: none;"></p>
+
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            
+            <!-- Username Input -->
+            <div>
+                <label for="username">User ID</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                >
+            </div>
+            <!-- Password Input -->
+            <div>
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                >
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit">
+                Login Now
+            </button>
+        </form>
+    </div>
+
+    <!-- Simple JavaScript for Login Logic -->
+    <script>
+        // Define all users, their passwords, and where they should be redirected.
+        const USERS = {
+            'user': { password: '1234', redirect: 'index.html' },
+            'driver': { password: '1234', redirect: 'driver.html' },
+            'admin': { password: '1234', redirect: 'adminpanel.html' }
+        };
+        
+        // Get the element where we show messages
+        const statusMessage = document.getElementById('statusMessage');
+
+        /**
+         * Function to show a message to the user.
+         * @param {string} message - The text to display.
+         * @param {boolean} isSuccess - True for green (success), False for red (error).
+         */
+        function displayStatus(message, isSuccess) {
+            // Set the text of the message box
+            statusMessage.innerHTML = message;
+
+            // Use simple inline styling for colors
+            if (isSuccess) {
+                statusMessage.style.color = 'green';
+                statusMessage.style.backgroundColor = '#e6ffe6'; // Light green background
+                statusMessage.style.border = '1px solid green';
+            } else {
+                statusMessage.style.color = 'red';
+                statusMessage.style.backgroundColor = '#ffe6e6'; // Light red background
+                statusMessage.style.border = '1px solid red';
+            }
+            
+            // Make the message box visible
+            statusMessage.style.display = 'block';
+        }
+
+        /**
+         * Handles the form submission and login validation.
+         */
+        function handleLogin(event) {
+            // This stops the page from reloading when the button is clicked!
+            event.preventDefault();
+
+            // Get the values the user typed in
+            const usernameInput = document.getElementById('username').value.trim();
+            const passwordInput = document.getElementById('password').value;
+
+            // Look up the user's info in our USERS list
+            const userInfo = USERS[usernameInput];
+
+            // Check if the user ID exists AND if the password matches the stored password
+            if (userInfo && passwordInput === userInfo.password) {
+                // If user exists AND password matches, SUCCESS!
+                displayStatus('Success! Going to the ' + usernameInput + ' panel...', true);
+                
+                // Wait 1 second (1000 milliseconds) and then change the page to the user's specific redirect
+                setTimeout(() => {
+                    window.location.href = userInfo.redirect;
+                }, 1000); 
+
+            } else {
+                // If ID is wrong OR password is wrong, FAILURE!
+                displayStatus('Oops! Wrong ID or Password. Try again.', false);
+            }
+        }
+        
+        // Make sure the message box is hidden when the page first loads
+        document.addEventListener('DOMContentLoaded', () => {
+            if (statusMessage) {
+                statusMessage.style.display = 'none';
+            }
+        });
+
+    </script>
+</body>
+</html>

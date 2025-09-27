@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Transport Portal</title>
+    
+    <!-- Simple styling using internal CSS, keeping the blue color -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Light gray background */
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #1e3a8a; /* Dark blue from login page */
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        #logout-btn {
+            background-color: #ff9900; /* A simple orange/gold accent */
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+
+        #logout-btn:hover {
+            background-color: #e68a00;
+        }
+
+        #main-content {
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap; 
+            gap: 20px; 
+            justify-content: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .info-card {
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            width: 100%; /* Full width on small screens */
+            box-shadow: 2px 2px 5px #aaa;
+            flex: 1 1 300px; /* Allows cards to flex/wrap */
+        }
+
+        #action-panel {
+            flex: 1 1 100%; /* Forces this panel to a new line */
+            min-height: 250px;
+        }
+
+        .info-card h2 {
+            color: #1e3a8a;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .action-button {
+            display: inline-block;
+            padding: 10px 15px;
+            margin-right: 10px;
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-button:hover {
+            background-color: #3354a5;
+        }
+
+        .report-form input[type="text"] {
+            width: 90%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #999;
+            border-radius: 4px; /* Added for the 'small box' look */
+        }
+
+        /* --- Styles for Detailed Pickup List --- */
+        .stop-list {
+            list-style: none;
+            padding: 0;
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        .stop-list li {
+            padding: 8px 0;
+            border-bottom: 1px dashed #ccc;
+            display: flex;
+            justify-content: space-between;
+        }
+        .stop-list strong {
+            color: #ff9900;
+        }
+        .stop-list li:last-child {
+            border-bottom: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Welcome to the Driver Portal</h1>
+        <button id="logout-btn" onclick="logout()">Logout</button>
+    </header>
+
+    <div id="main-content">
+
+        <!-- Card 1: Driver and Bus Information (Populated via JS on load) -->
+        <div class="info-card">
+            <h2>My Assigned Duty</h2>
+            <p><strong>Driver Name:</strong> <span id="driver-name"></span></p>
+            <p><strong>Assigned Bus:</strong> <span id="bus-no"></span></p>
+            <p><strong>Assigned Route:</strong> <span id="route-name"></span></p>
+            <hr>
+            <p><strong>Route Description:</strong> <span id="route-desc"></span></p>
+        </div>
+
+        <!-- Card 2: Schedule Information (Populated via JS on load) -->
+        <div class="info-card">
+            <h2>Today's Schedule</h2>
+            <p>This is your fixed daily running schedule.</p>
+            <hr>
+            <h3>Morning Trip (Pickup)</h3>
+            <p><strong>Departure Time:</strong> <span id="morning-dep"></span></p>
+            <p><strong>College Arrival:</strong> <span id="morning-arr"></span></p>
+            <hr>
+            <h3>Afternoon Trip (Drop-off)</h3>
+            <p><strong>College Departure:</strong> <span id="evening-dep"></span></p>
+            <p><strong>Final Drop-off Time:</strong> <span id="evening-arr"></span></p>
+        </div>
+
+        <!-- Card 3: Action Panel -->
+        <div class="info-card" id="action-panel">
+            <h2>Driver Actions</h2>
+            <button class="action-button" onclick="showRouteMap()">View Route Map</button>
+            <button class="action-button" onclick="showReportForm()">Report Issue</button>
+            
+            <div id="action-details" style="margin-top: 20px;">
+                <!-- Content will appear here when buttons are clicked -->
+                <p>Click an action above to proceed.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Simple JavaScript for functionality -->
+    <script>
+        // --- DRIVER MOCK DATA ---
+        const DRIVER_INFO = {
+            name: 'Deepak Kumar',
+            bus: '1A',
+            route: 'Outer Ring Road',
+            description: 'Koramangala, Marathahalli, Bellandur',
+            schedule: {
+                morningDep: '7:00 AM',
+                morningArr: '8:00 AM',
+                eveningDep: '4:30 PM',
+                eveningArr: '5:30 PM'
+            },
+            stops: [
+                { name: 'Koramangala Stop 1', time: '6:50 AM' },
+                { name: 'Koramangala Stop 2', time: '6:55 AM' },
+                { name: 'Intermediate Stop 3', time: '7:05 AM' },
+                { name: 'Marathahalli Bridge', time: '7:15 AM' },
+                { name: 'Bellandur Gate', time: '7:30 AM' },
+                { name: 'Sarjapur Signal', time: '7:45 AM' },
+                { name: 'Final Pickup Point', time: '7:50 AM' },
+                { name: 'College Main Gate', time: '8:00 AM' }
+            ]
+        };
+        
+        // Get the area where dynamic content is shown
+        const actionDetails = document.getElementById('action-details');
+
+        /**
+         * Populates the static info cards on page load.
+         */
+        function populateDriverInfo() {
+            document.getElementById('driver-name').textContent = DRIVER_INFO.name;
+            document.getElementById('bus-no').textContent = DRIVER_INFO.bus;
+            document.getElementById('route-name').textContent = DRIVER_INFO.route;
+            document.getElementById('route-desc').textContent = DRIVER_INFO.description;
+
+            document.getElementById('morning-dep').textContent = DRIVER_INFO.schedule.morningDep;
+            document.getElementById('morning-arr').textContent = DRIVER_INFO.schedule.morningArr;
+            document.getElementById('evening-dep').textContent = DRIVER_INFO.schedule.eveningDep;
+            document.getElementById('evening-arr').textContent = DRIVER_INFO.schedule.eveningArr;
+        }
+
+        /**
+         * Function to show the simulated route map with all pickup points.
+         */
+        function showRouteMap() {
+            // 1. Generate the Stops List HTML without any special bolding or conditional styles
+            let stopsHtml = DRIVER_INFO.stops.map((stop, index) => {
+                // The list item style is now uniform (no bolding for the final stop)
+                return `
+                    <li>
+                        <span>${index + 1}. ${stop.name}</span> 
+                        <strong>${stop.time}</strong>
+                    </li>
+                `;
+            }).join('');
+
+            // 2. Build the final HTML content for the Action Panel, removing the "Route Complete" message
+            actionDetails.innerHTML = `
+                <h3>${DRIVER_INFO.route} Pickup Schedule</h3>
+                
+                <h4>Total ${DRIVER_INFO.stops.length - 1} Pickup Stops</h4>
+                <ul class="stop-list">
+                    ${stopsHtml}
+                </ul>
+                <!-- Route Complete message removed as requested -->
+            `;
+        }
+
+        /**
+         * Function to show the incident reporting form.
+         */
+        function showReportForm() {
+            actionDetails.innerHTML = `
+                <h3>Report an Incident/Delay</h3>
+                <p>Please enter a brief summary of the issue:</p>
+                <form class="report-form" onsubmit="submitReport(event)">
+                    <input 
+                        type="text" 
+                        id="report-title" 
+                        required 
+                        placeholder="e.g., Engine trouble near Bellandur"
+                        style="width: 100%;" 
+                    >
+                    <button type="submit" style="width: 100%; background-color: #ff9900; margin-top: 15px; padding: 10px; border-radius: 4px; color: white; border: none; cursor: pointer;">
+                        Submit Report
+                    </button>
+                </form>
+            `;
+        }
+
+        /**
+         * Handles the report submission (simulated).
+         */
+        function submitReport(event) {
+            event.preventDefault(); // Stop the form from submitting normally
+            const title = document.getElementById('report-title').value;
+            
+            // Give simple confirmation
+            actionDetails.innerHTML = `
+                <h3>Report Submitted!</h3>
+                <p>Thank you, ${DRIVER_INFO.name}. Your report about <strong>"${title}"</strong> has been logged.</p>
+                <p style="color: red;">The transport admin has been notified.</p>
+            `;
+        }
+
+        /**
+         * Function to log the user out and redirect them to the register page.
+         */
+        function logout() {
+            // Driver logs out and goes back to the register page (as requested)
+            window.location.href = 'register.html'; 
+        }
+
+        // Run functions when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            populateDriverInfo();
+        });
+
+    </script>
+</body>
+</html>

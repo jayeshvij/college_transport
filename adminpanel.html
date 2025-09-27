@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Transport Dashboard</title>
+    
+    <!-- Simple styling using internal CSS, keeping the blue color -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Light gray background */
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #1e3a8a; /* Dark blue */
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        #logout-btn {
+            background-color: #ff9900; /* Orange accent */
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+
+        #logout-btn:hover {
+            background-color: #e68a00;
+        }
+
+        #dashboard-container {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Simple Navigation Bar (Sidebar) */
+        #nav-bar {
+            width: 200px;
+            background-color: white;
+            padding: 10px;
+            box-shadow: 2px 2px 5px #aaa;
+            align-self: flex-start; /* Keeps it at the top */
+        }
+
+        #nav-bar button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        #nav-bar button:hover {
+            background-color: #3354a5;
+        }
+
+        #nav-bar .active-btn {
+            background-color: #ff9900;
+        }
+
+        /* Main Content Area */
+        #main-content {
+            flex-grow: 1;
+        }
+
+        .section-title {
+            color: #1e3a8a;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        /* Overview Cards */
+        #overview-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .overview-card {
+            background-color: white;
+            padding: 20px;
+            flex: 1 1 200px; /* Allows cards to wrap nicely */
+            box-shadow: 2px 2px 5px #aaa;
+            text-align: center;
+        }
+
+        .overview-card h3 {
+            color: #1e3a8a;
+            font-size: 16px;
+            margin-top: 0;
+        }
+
+        .overview-card p {
+            font-size: 36px;
+            font-weight: bold;
+            color: #ff9900;
+            margin: 0;
+        }
+
+        /* Tables for management views */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 2px 2px 5px #aaa;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #1e3a8a;
+            color: white;
+        }
+
+        /* Responsive design for smaller screens */
+        @media (max-width: 768px) {
+            #dashboard-container {
+                flex-direction: column;
+            }
+
+            #nav-bar {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            #nav-bar button {
+                width: calc(50% - 5px); /* Two buttons per row */
+                display: inline-block;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Transport Admin Panel</h1>
+        <!-- Using a placeholder for now, ideally this would go to a logout process -->
+        <button id="logout-btn" onclick="logout()">Logout</button> 
+    </header>
+
+    <div id="dashboard-container">
+        
+        <!-- Navigation Menu -->
+        <nav id="nav-bar">
+            <button id="btn-overview" class="active-btn" onclick="showSection('overview')">Dashboard Overview</button>
+            <button id="btn-routes" onclick="showSection('routes')">Route Management</button>
+            <button id="btn-buses" onclick="showSection('buses')">Bus Management</button>
+            <button id="btn-drivers" onclick="showSection('drivers')">Driver Details</button>
+        </nav>
+
+        <!-- Main Content Display Area -->
+        <div id="main-content">
+            
+            <!-- SECTION 1: OVERVIEW (Default View) -->
+            <div id="overview-section" class="content-section">
+                <h2 class="section-title">System Overview and Key Metrics</h2>
+                <div id="overview-grid">
+                    <div class="overview-card">
+                        <h3>Total Registered Students</h3>
+                        <p id="metric-students">1250</p>
+                    </div>
+                    <div class="overview-card">
+                        <h3>Total Buses in Fleet</h3>
+                        <p id="metric-buses">4</p>
+                    </div>
+                    <div class="overview-card">
+                        <h3>Total Active Routes</h3>
+                        <p id="metric-routes">4</p>
+                    </div>
+                    <div class="overview-card">
+                        <h3>Total Assigned Drivers</h3>
+                        <p id="metric-drivers">4</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SECTION 2: ROUTE MANAGEMENT -->
+            <div id="routes-section" class="content-section" style="display: none;">
+                <h2 class="section-title">All College Routes (Bangalore Focus)</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Route ID</th>
+                            <th>Bus No.</th>
+                            <th>Route Name</th>
+                            <th>Key Areas Covered</th>
+                        </tr>
+                    </thead>
+                    <tbody id="routes-table-body">
+                        <!-- Data will be inserted by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- SECTION 3: BUS MANAGEMENT -->
+            <div id="buses-section" class="content-section" style="display: none;">
+                <h2 class="section-title">Fleet Details and Capacity</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Bus No.</th>
+                            <th>Capacity (Seats)</th>
+                            <th>Assigned Route</th>
+                            <th>Current Driver</th>
+                        </tr>
+                    </thead>
+                    <tbody id="buses-table-body">
+                        <!-- Data will be inserted by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SECTION 4: DRIVER DETAILS -->
+            <div id="drivers-section" class="content-section" style="display: none;">
+                <h2 class="section-title">Driver Contact and Assignment</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Contact Phone</th>
+                            <th>Assigned Bus</th>
+                            <th>Route</th>
+                        </tr>
+                    </thead>
+                    <tbody id="drivers-table-body">
+                        <!-- Data will be inserted by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Simple JavaScript for Dashboard Logic and Data Loading -->
+    <script>
+        // --- MOCK DATA FOR DEMONSTRATION (Beginner-friendly data structure) ---
+        const ALL_ROUTES = [
+            { id: 'R1', bus: '1A', name: 'Outer Ring Road', areas: 'Koramangala, Marathahalli', driverId: 'D1' },
+            { id: 'R2', bus: '2B', name: 'Electronic City', areas: 'Phase 1 & 2, Infosys Stop', driverId: 'D2' },
+            { id: 'R3', bus: '3C', name: 'Yeshwanthpur Express', areas: 'Tumkur Road, Hebbal', driverId: 'D3' },
+            { id: 'R4', bus: '4D', name: 'Whitefield Loop', areas: 'Varthur, Whitefield Main Road', driverId: 'D4' },
+        ];
+
+        const ALL_BUSES = [
+            { bus: '1A', capacity: 55, routeId: 'R1' },
+            { bus: '2B', capacity: 48, routeId: 'R2' },
+            { bus: '3C', capacity: 60, routeId: 'R3' },
+            { bus: '4D', capacity: 50, routeId: 'R4' },
+        ];
+
+        const ALL_DRIVERS = [
+            { id: 'D1', name: 'Deepak Kumar', phone: '98765 12345', bus: '1A' },
+            { id: 'D2', name: 'Ravi Sharma', phone: '91234 56789', bus: '2B' },
+            { id: 'D3', name: 'Priya Patel', phone: '80112 23344', bus: '3C' },
+            { id: 'D4', name: 'Mohammed Khan', phone: '77889 90011', bus: '4D' },
+        ];
+        
+        // --- Core Functions ---
+
+        /**
+         * Function to simulate logging out by redirecting.
+         */
+        function logout() {
+            // Admin logs out and goes back to the main login page
+            window.location.href = 'login.html'; 
+        }
+
+        /**
+         * Finds a driver's name by their assigned bus number.
+         * @param {string} busNo - The bus number.
+         * @returns {string} The driver's name or a default message.
+         */
+        function getDriverName(busNo) {
+            const driver = ALL_DRIVERS.find(d => d.bus === busNo);
+            return driver ? driver.name : 'Unassigned';
+        }
+
+        /**
+         * Finds a route name by its ID.
+         * @param {string} routeId - The route ID.
+         * @returns {string} The route name.
+         */
+        function getRouteName(routeId) {
+            const route = ALL_ROUTES.find(r => r.id === routeId);
+            return route ? route.name : 'N/A';
+        }
+
+        /**
+         * Populates the tables using the mock data.
+         * This function runs once when the page loads.
+         */
+        function loadData() {
+            // 1. Populate Routes Table
+            const routesBody = document.getElementById('routes-table-body');
+            ALL_ROUTES.forEach(route => {
+                const row = routesBody.insertRow();
+                row.insertCell().textContent = route.id;
+                row.insertCell().textContent = route.bus;
+                row.insertCell().textContent = route.name;
+                row.insertCell().textContent = route.areas;
+            });
+
+            // 2. Populate Buses Table
+            const busesBody = document.getElementById('buses-table-body');
+            ALL_BUSES.forEach(bus => {
+                const route = getRouteName(bus.routeId);
+                const driver = getDriverName(bus.bus);
+                const row = busesBody.insertRow();
+                row.insertCell().textContent = bus.bus;
+                row.insertCell().textContent = bus.capacity + ' seats';
+                row.insertCell().textContent = route;
+                row.insertCell().textContent = driver;
+            });
+
+            // 3. Populate Drivers Table
+            const driversBody = document.getElementById('drivers-table-body');
+            ALL_DRIVERS.forEach(driver => {
+                const assignedRoute = ALL_ROUTES.find(r => r.bus === driver.bus);
+                const row = driversBody.insertRow();
+                row.insertCell().textContent = driver.name;
+                row.insertCell().textContent = driver.phone;
+                row.insertCell().textContent = driver.bus;
+                row.insertCell().textContent = assignedRoute ? assignedRoute.name : 'N/A';
+            });
+            
+            // 4. Update Overview Metrics (though they are hardcoded, this is good practice)
+            document.getElementById('metric-buses').textContent = ALL_BUSES.length;
+            document.getElementById('metric-routes').textContent = ALL_ROUTES.length;
+            document.getElementById('metric-drivers').textContent = ALL_DRIVERS.length;
+        }
+
+
+        /**
+         * Function to switch the visible section of the dashboard.
+         * @param {string} sectionId - The ID of the section to show (e.g., 'overview').
+         */
+        function showSection(sectionId) {
+            // Hide all content sections first
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Show the requested section
+            document.getElementById(sectionId + '-section').style.display = 'block';
+
+            // Update active button styling
+            document.querySelectorAll('#nav-bar button').forEach(btn => {
+                btn.classList.remove('active-btn');
+            });
+            document.getElementById('btn-' + sectionId).classList.add('active-btn');
+        }
+
+        // Run data loading when the page is fully ready
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            // Ensure the overview is shown on load
+            showSection('overview'); 
+        });
+
+    </script>
+</body>
+</html>
