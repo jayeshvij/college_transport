@@ -87,7 +87,7 @@
             margin-top: 0;
         }
 
-        /* Overview Cards */
+        /* Overview Cards (also used for form cards) */
         #overview-grid {
             display: flex;
             flex-wrap: wrap;
@@ -168,6 +168,7 @@
         <!-- Navigation Menu -->
         <nav id="nav-bar">
             <button id="btn-overview" class="active-btn" onclick="showSection('overview')">Dashboard Overview</button>
+            <button id="btn-data-input" onclick="showSection('data-input')">Data Input</button>
             <button id="btn-routes" onclick="showSection('routes')">Route Management</button>
             <button id="btn-buses" onclick="showSection('buses')">Bus Management</button>
             <button id="btn-drivers" onclick="showSection('drivers')">Driver Details</button>
@@ -199,6 +200,60 @@
                 </div>
             </div>
             
+            <!-- SECTION 5: DATA INPUT / SETUP (NEW) -->
+            <div id="data-input-section" class="content-section" style="display: none;">
+                <h2 class="section-title">System Data Input and Setup</h2>
+                
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px;">
+                    
+                    <!-- Form 1: Add New Bus -->
+                    <div class="overview-card" style="flex: 1 1 300px; text-align: left;">
+                        <h3>Add New Bus</h3>
+                        <form class="admin-form" onsubmit="submitNewData(event, 'Bus')">
+                            <label for="busId" style="font-weight: bold; display: block; margin-top: 10px;">Bus ID</label>
+                            <input type="text" id="busId" required placeholder="" style="padding: 8px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; margin-bottom: 10px; border-radius: 4px;">
+                            <label for="capacity" style="font-weight: bold; display: block; margin-top: 10px;">Capacity (Seats)</label>
+                            <input type="number" id="capacity" required placeholder="" style="padding: 8px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; margin-bottom: 10px; border-radius: 4px;">
+                            <label for="busStatus" style="font-weight: bold; display: block; margin-top: 10px;">Status</label>
+                            <input type="text" id="busStatus" required value="Active" placeholder="" style="padding: 8px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; margin-bottom: 15px; border-radius: 4px;">
+                            <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 15px; border: none; cursor: pointer; border-radius: 4px;">Add Bus</button>
+                            <p id="bus-status-msg" style="margin-top: 10px; color: green; font-weight: bold; font-size: 14px;"></p>
+                        </form>
+                    </div>
+                    
+                    <!-- Form 2: Add New Driver -->
+                    <div class="overview-card" style="flex: 1 1 300px; text-align: left;">
+                        <h3>Add New Driver</h3>
+                        <form class="admin-form" onsubmit="submitNewData(event, 'Driver')">
+                            <label for="driverName" style="font-weight: bold; display: block; margin-top: 10px;">Driver Name</label>
+                            <input type="text" id="driverName" required placeholder="" style="padding: 8px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; margin-bottom: 10px; border-radius: 4px;">
+                            <label for="driverPhone" style="font-weight: bold; display: block; margin-top: 10px;">Phone Number</label>
+                            <input type="text" id="driverPhone" required placeholder="" style="padding: 8px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; margin-bottom: 10px; border-radius: 4px;">
+                            <label for="assignedBusId" style="font-weight: bold; display: block; margin-top: 10px;">Assign Bus ID</label>
+                            <input type="text" id="assignedBusId" placeholder="" style="padding: 8px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; margin-bottom: 15px; border-radius: 4px;">
+                            <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 15px; border: none; cursor: pointer; border-radius: 4px;">Add Driver</button>
+                            <p id="driver-status-msg" style="margin-top: 10px; color: green; font-weight: bold; font-size: 14px;"></p>
+                        </form>
+                    </div>
+
+                    <!-- Form 3: Add New Route -->
+                    <div class="overview-card" style="flex: 1 1 300px; text-align: left;">
+                        <h3>Add New Route</h3>
+                        <form class="admin-form" onsubmit="submitNewData(event, 'Route')">
+                            <label for="routeName" style="font-weight: bold; display: block; margin-top: 10px;">Route Name</label>
+                            <input type="text" id="routeName" required placeholder="" style="padding: 8px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; margin-bottom: 10px; border-radius: 4px;">
+                            <label for="routeStops" style="font-weight: bold; display: block; margin-top: 10px;">Total Stops</label>
+                            <input type="number" id="routeStops" required placeholder="" style="padding: 8px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; margin-bottom: 10px; border-radius: 4px;">
+                            <label for="routeAreas" style="font-weight: bold; display: block; margin-top: 10px;">Key Areas (comma separated)</label>
+                            <textarea id="routeAreas" required placeholder="" style="padding: 8px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; margin-bottom: 15px; border-radius: 4px;"></textarea>
+                            <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 15px; border: none; cursor: pointer; border-radius: 4px;">Create Route</button>
+                            <p id="route-status-msg" style="margin-top: 10px; color: green; font-weight: bold; font-size: 14px;"></p>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
             <!-- SECTION 2: ROUTE MANAGEMENT -->
             <div id="routes-section" class="content-section" style="display: none;">
                 <h2 class="section-title">All College Routes (Bangalore Focus)</h2>
@@ -317,6 +372,8 @@
         function loadData() {
             // 1. Populate Routes Table
             const routesBody = document.getElementById('routes-table-body');
+            // Clear existing rows before loading (important when using real data later)
+            routesBody.innerHTML = ''; 
             ALL_ROUTES.forEach(route => {
                 const row = routesBody.insertRow();
                 row.insertCell().textContent = route.id;
@@ -327,6 +384,8 @@
 
             // 2. Populate Buses Table
             const busesBody = document.getElementById('buses-table-body');
+            // Clear existing rows
+            busesBody.innerHTML = '';
             ALL_BUSES.forEach(bus => {
                 const route = getRouteName(bus.routeId);
                 const driver = getDriverName(bus.bus);
@@ -339,6 +398,8 @@
 
             // 3. Populate Drivers Table
             const driversBody = document.getElementById('drivers-table-body');
+            // Clear existing rows
+            driversBody.innerHTML = '';
             ALL_DRIVERS.forEach(driver => {
                 const assignedRoute = ALL_ROUTES.find(r => r.bus === driver.bus);
                 const row = driversBody.insertRow();
@@ -354,6 +415,44 @@
             document.getElementById('metric-drivers').textContent = ALL_DRIVERS.length;
         }
 
+        /**
+         * Simulates the submission of new data.
+         * In a real application, this would call a Firebase/Firestore function.
+         */
+        function submitNewData(event, dataType) {
+            event.preventDefault(); // Stop form reload
+
+            let message = '';
+            let statusId = '';
+
+            switch(dataType) {
+                case 'Bus':
+                    const busId = document.getElementById('busId').value;
+                    message = `${busId} successfully added to fleet (Mock Save).`;
+                    statusId = 'bus-status-msg';
+                    break;
+                case 'Driver':
+                    const driverName = document.getElementById('driverName').value;
+                    message = `${driverName} added and ready for assignment (Mock Save).`;
+                    statusId = 'driver-status-msg';
+                    break;
+                case 'Route':
+                    const routeName = document.getElementById('routeName').value;
+                    message = `${routeName} route map created (Mock Save).`;
+                    statusId = 'route-status-msg';
+                    break;
+            }
+            
+            // Show success message
+            document.getElementById(statusId).textContent = message;
+            // Clear message after 3 seconds
+            setTimeout(() => {
+                document.getElementById(statusId).textContent = '';
+            }, 3000);
+
+            // Optional: Clear the form fields after submission
+            event.target.reset(); 
+        }
 
         /**
          * Function to switch the visible section of the dashboard.
