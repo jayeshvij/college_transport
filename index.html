@@ -7,6 +7,7 @@
     
     <!-- Simple styling using internal CSS, keeping the blue color -->
     <style>
+        /* General Setup */
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0; /* Light gray background */
@@ -14,8 +15,9 @@
             padding: 0;
         }
 
+        /* Header Styling */
         header {
-            background-color: #1e3a8a; /* Dark blue from login page */
+            background-color: #1e3a8a; /* Dark blue */
             color: white;
             padding: 15px 20px;
             display: flex;
@@ -29,32 +31,36 @@
         }
 
         #logout-btn {
-            background-color: #ff9900; /* A simple orange/gold accent */
+            background-color: #ff9900; /* Orange/Gold accent */
             color: white;
             border: none;
             padding: 8px 15px;
             cursor: pointer;
+            border-radius: 4px;
         }
 
         #logout-btn:hover {
             background-color: #e68a00;
         }
 
+        /* Main Content and Layout (Flex container) */
         #main-content {
             padding: 20px;
             display: flex;
             flex-wrap: wrap; /* Allows cards to wrap on mobile */
             gap: 20px; /* Space between the information boxes */
-            justify-content: center;
+            justify-content: center; /* Center items horizontally */
         }
 
+        /* Info Card Styling */
         .info-card {
             background-color: white;
             border: 1px solid #ccc;
             padding: 20px;
-            width: 100%; /* Full width on small screens */
-            max-width: 400px; /* Max width on desktop */
+            flex: 1 1 350px; /* Allows cards to grow and wrap nicely */
+            max-width: 400px;
             box-shadow: 2px 2px 5px #aaa;
+            border-radius: 8px;
         }
 
         .info-card h2 {
@@ -62,6 +68,39 @@
             border-bottom: 2px solid #ccc;
             padding-bottom: 10px;
             margin-top: 0;
+        }
+        
+        /* Notification History Styles */
+        #notification-history {
+            max-height: 250px; /* Limits the height of the history list */
+            overflow-y: auto; /* Adds a scrollbar when the list gets too long */
+            padding-right: 5px; /* Space for the scrollbar */
+        }
+
+        .history-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            /* Border and background are removed for simplicity, using just the default white card background */
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            border-bottom: 1px dotted #ccc; /* Simple separator line */
+        }
+        
+        /* Removed .item-delay and .item-arrival for simple static display */
+
+        .item-timestamp {
+            font-size: 10px;
+            color: #6b7280; /* Gray timestamp */
+            margin-left: 10px;
+            white-space: nowrap; /* Prevents time from wrapping */
+        }
+
+        .item-message {
+            flex-grow: 1;
         }
 
     </style>
@@ -75,7 +114,7 @@
 
     <div id="main-content">
 
-        <!-- Card 1: User's Route Information - UPDATED -->
+        <!-- Card 1: User's Route Information -->
         <div class="info-card">
             <h2>My Current Route</h2>
             <p><strong>Name:</strong> <span id="user-id">Jayesh</span></p>
@@ -88,16 +127,15 @@
         <!-- Card 2: Schedule/Time Information -->
         <div class="info-card">
             <h2>Today's Schedule</h2>
-            <!-- Removed live clock here to simplify -->
             <p>This schedule is fixed daily.</p>
             <hr>
-            <p><strong>Morning Pickup Time:</strong> 7:45 AM</p>
+            <p><strong>Morning Pickup Time:</strong> <span id="morning-pickup">7:45 AM</span></p>
             <p><strong>Arrival Time at College:</strong> 8:20 AM</p>
             <hr>
             <p><strong>Afternoon Departure Time:</strong> 4:30 PM</p>
         </div>
 
-        <!-- Card 3: Contact Information - UPDATED -->
+        <!-- Card 3: Contact Information -->
         <div class="info-card">
             <h2>Contact Transport Office</h2>
             <p>If you have questions about schedules or need assistance:</p>
@@ -105,19 +143,81 @@
             <p><strong>Email:</strong> transport@sjbit.edu.in</p>
         </div>
 
+        <!-- Card 4: Notification History (NEW) -->
+        <div class="info-card" id="notification-history-card">
+            <h2>Notification History</h2>
+            <div id="notification-history">
+                <p style="color: #666; font-style: italic; text-align: center;">Loading static updates...</p>
+                <!-- Static notifications will be added here -->
+            </div>
+        </div>
+
     </div>
 
     <!-- Simple JavaScript for functionality -->
     <script>
-        // All the time-related functions (updateTime, setInterval) were removed!
-
+        
         /**
          * Function to log the user out and redirect them to the registration page.
          */
         function logout() {
-            // A beginner's way to go to the registration page
+            // In a real app, this would clear session/auth tokens.
             window.location.href = 'register.html'; 
         }
+
+        // --- Notification Logic ---
+
+        /**
+         * Displays a notification by adding it to the history list.
+         * Note: Type is only used internally to update the schedule text if it's a delay.
+         * @param {string} type - 'arrival', 'delay', or 'change'.
+         * @param {string} message - The notification text.
+         */
+        function showNotification(type, message) {
+            const historyList = document.getElementById('notification-history');
+            
+            // Remove the 'Loading...' placeholder if it exists
+            const placeholder = historyList.querySelector('p');
+            if (placeholder && placeholder.textContent.includes('Loading static updates')) {
+                historyList.innerHTML = '';
+            }
+
+            // Use a consistent time for static messages
+            let timestamp = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+            // Update schedule display for delays (hardcoded for the static delay message)
+            if (message.includes('20 minutes late')) {
+                document.getElementById('morning-pickup').textContent = '8:05 AM (Delayed)';
+            }
+
+            // Create the new notification element - using only the base history-item class
+            const newItem = document.createElement('div');
+            newItem.className = 'history-item'; // Simple class assignment
+            newItem.innerHTML = `
+                <span class="item-message">${message}</span>
+                <span class="item-timestamp">${timestamp}</span>
+            `;
+
+            // Add the new item to the TOP of the history list (most recent first)
+            historyList.prepend(newItem);
+        }
+
+        /**
+         * STATIC NOTIFICATIONS: Triggers the three requested notifications instantly.
+         */
+        function loadStaticNotifications() {
+            // 1. Static Delay (Newest, appears first)
+            showNotification('delay', 'Bus 42B is running **20 minutes late** this morning due to unexpected weather conditions.');
+
+            // 2. Static Route Change
+            showNotification('change', 'ROUTE CHANGE: Due to bridge maintenance, the route will bypass the Outer Ring Road section this afternoon. Expect minor delays.');
+
+            // 3. Static Bus Number Change (Oldest, appears last in the list)
+            showNotification('change', 'BUS NUMBER CHANGE: Your assigned bus has temporarily changed from Bus 42B to **Bus 55A** for today only.');
+        }
+
+        // Initialize static notifications on page load
+        document.addEventListener('DOMContentLoaded', loadStaticNotifications);
 
     </script>
 </body>
